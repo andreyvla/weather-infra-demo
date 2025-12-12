@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  weather:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: weather-service
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      LATITUDE: 55.7558
+      LONGITUDE: 37.6173
+      WEATHER_CACHE_TTL: 60s
+      WEATHER_TIMEOUT: 2s
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    volumes:
+      - ../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - weather
+      - blackbox
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox
+    volumes:
+      - ../monitoring/blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    ports:
+      - "9115:9115"
