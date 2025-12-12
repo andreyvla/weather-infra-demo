@@ -18,6 +18,7 @@ import (
 
 func main() {
 	observability.InitLogger()
+	observability.InitMetrics()
 
 	log.Info().Msg("starting weather service")
 

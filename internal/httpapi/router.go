@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/andreyvla/weather-infra-demo/internal/weather"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type API struct {
@@ -19,6 +20,7 @@ func NewRouter(weatherService *weather.Service) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", api.healthHandler)
 	mux.HandleFunc("/weather", api.weatherHandler)
+	mux.Handle("/metrics", promhttp.Handler())
 
 	return LoggingMiddleware(mux)
 }

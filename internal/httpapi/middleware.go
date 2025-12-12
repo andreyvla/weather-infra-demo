@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/andreyvla/weather-infra-demo/internal/observability"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,5 +23,15 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 			Int("status", rw.statusCode).
 			Dur("latency", latency).
 			Msg("http request completed")
+
+		observability.HTTPRequestsTotal.WithLabelValues(
+			r.Method,
+			r.URL.Path,
+			http.StatusText(rw.statusCode),
+		).Inc()
+
+		observability.HTTPRequestDuration.WithLabelValues(
+			r.URL.Path,
+		).Observe(latency.Seconds())
 	})
 }
