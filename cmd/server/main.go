@@ -12,6 +12,7 @@ import (
 	"github.com/andreyvla/weather-infra-demo/internal/config"
 	"github.com/andreyvla/weather-infra-demo/internal/httpapi"
 	"github.com/andreyvla/weather-infra-demo/internal/observability"
+	"github.com/andreyvla/weather-infra-demo/internal/weather"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,7 +26,17 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to load config")
 	}
 
-	router := httpapi.NewRouter()
+	weatherClient := weather.NewClient(
+		cfg.WeatherTimeout,
+		cfg.Latitude,
+		cfg.Longitude,
+	)
+
+	weatherCache := weather.NewCache(cfg.WeatherCacheTTL)
+
+	weatherService := weather.NewService(weatherClient, weatherCache)
+
+	router := httpapi.NewRouter(weatherService)
 
 	server := &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.Port),
