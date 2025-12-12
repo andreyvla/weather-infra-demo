@@ -1,0 +1,12 @@
+.git
+.gitignore
+
+deploy/
+monitoring/
+
+*.md
+
+.idea
+.vscode
+
+.env
