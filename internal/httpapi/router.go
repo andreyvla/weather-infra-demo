@@ -20,7 +20,7 @@ func NewRouter(weatherService *weather.Service) http.Handler {
 	mux.HandleFunc("/health", api.healthHandler)
 	mux.HandleFunc("/weather", api.weatherHandler)
 
-	return mux
+	return LoggingMiddleware(mux)
 }
 
 func (a *API) healthHandler(w http.ResponseWriter, r *http.Request) {
